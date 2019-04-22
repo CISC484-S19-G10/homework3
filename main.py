@@ -5,7 +5,9 @@ import random as rnd
 from matplotlib import cm
 from matplotlib import pyplot as plt
 
-
+#########################################################################################################
+# Function defs
+#########################################################################################################
 
 def pprint(arr):
     for element in arr:
@@ -32,17 +34,24 @@ def pntDistance(pOne, pTwo):
     distance = tmpSum/3
 
     return distance
+
+def getImage(imName):
+    DIR = os.getcwd()                           # get current directory
+    img = Image.open(DIR + '\\' + imName)       # import image
+    imgArr = np.asarray(img)                    # img -> array
+    xPix,yPix = img.size                        # img dimensions
+    totalPix = xPix*yPix                        # img size in pixels
+    return img,imgArr,xPix,yPix,totalPix           
+
 #########################################################################################################
 
 #########################################################################################################
-DIR = os.getcwd()
-img = Image.open(DIR + '\sunFlower.jpg')
-xPix,yPix = img.size
-totalPix = xPix*yPix
+
+img,imgArr,xPix,yPix,totalPix = getImage('sunFlower.jpg')
 
 # img.show()    #display image
 
-imgArr = np.asarray(img)    #convert to 3d array, x,y,RGB
+kArr = {1,2,5,10,20}
 
 p0 = []
 p1 = []
@@ -68,29 +77,22 @@ while((p0 != avgP0) and (p1 != avgP1)):
                 numP1 += 1
         classArr.append(classRow)
 
-    # pprint(classArr)
-    # print(classArr[0][0])
     sumP0 = [0,0,0]
     sumP1 = [0,0,0]
     for i in range(yPix):
 
         for j in range(xPix):
-            # print(imgArr[i][j])
-            # print(classArr[i][j])
-
+        
             if classArr[i][j][0] == 0:
                 sumP0[0] += int(imgArr[i][j][0])
                 sumP0[1] += int(imgArr[i][j][1])
                 sumP0[2] += int(imgArr[i][j][2])
-                # print("************************SUMPO: ",end="")
-                # print(sumP0)
+                
             else:
                 sumP1[0] += int(imgArr[i][j][0])
                 sumP1[1] += int(imgArr[i][j][1])
                 sumP1[2] += int(imgArr[i][j][2])
-                # print("SUMP1: ",end="")
-                # print(sumP1)
-
+                
     avgP0 = [0,0,0]
     avgP1 = [0,0,0]
 
@@ -103,7 +105,13 @@ while((p0 != avgP0) and (p1 != avgP1)):
     avgP1[2] = sumP1[2]/numP1
 
     print(avgP0,avgP1)
+
+
+
 ##########################################################################3
+# saving to file
+##########################################################################3
+
 avgP0int = [0,0,0]
 avgP1int = [0,0,0]
 
@@ -121,7 +129,6 @@ for i in range(yPix):
         else:
             tmpRow.append(avgP1int)
     newImg.append(tmpRow)
-# print(np.asarray(newImg))
 
 plt.figure()
 plt.imshow(newImg,cmap="gist_earth",interpolation='nearest')
