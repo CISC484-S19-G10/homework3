@@ -13,17 +13,17 @@ def pprint(arr):
     for element in arr:
         print(element)
 
-def initialPoints():
-    pntOne =[]
-    pntTwo = []
+def initialPoints(k):
+    pnts = []
 
-    for i in range(6):
-        tmpVal  = rnd.randint(0,255)
-        if i < 3:
-            pntOne.append(tmpVal)
-        else:
-            pntTwo.append(tmpVal)
-    return pntOne,pntTwo
+    for i in range(k):
+        tmpPnt = []
+        for j in range(3):
+            tmpVal  = rnd.randint(0,255)
+            tmpPnt.append(tmpVal)
+        pnts.append(tmpPnt)
+
+    return pnts
 
 def pntDistance(pOne, pTwo):
     tmpSum = 0
@@ -50,84 +50,78 @@ def getImage(imName):
 img,imgArr,xPix,yPix,totalPix = getImage('sunFlower.jpg')
 
 # img.show()    #display image
-
+K = 20
 kArr = {1,2,5,10,20}
+points = []
 
-p0 = []
-p1 = []
-avgP0,avgP1 = initialPoints()
+for i in range(K):
+    points.append([])
 
-while((p0 != avgP0) and (p1 != avgP1)):
-    
-    p0 = avgP0
-    p1 = avgP1
+avgs = initialPoints(K)
+
+while(points != avgs):
+    classCnts = []
+    sums = []
+    distances = []
+
+    for i in range(K):
+        points[i] = avgs[i]
+        classCnts.append(0)
+        sums.append([0,0,0])
+        distances.append(0)
 
     classArr = []
-    numP0 = 0
-    numP1 = 0
-
+    
     for row in imgArr:
         classRow = []
         for pixel in row:
-            if ( pntDistance(p0,pixel) <= pntDistance(p1,pixel) ):
-                classRow.append([0])
-                numP0 += 1
-            else:
-                classRow.append([1])
-                numP1 += 1
-        classArr.append(classRow)
+            for i in range(K):
+                distances[i] = pntDistance(points[i],pixel)     # find distance from pixel to each point
+           
+            mDist = min(distances)                              # find closest point
+            mDistIdx = distances.index(mDist)                   # get index of that point
+            classRow.append(mDistIdx)                           # store index of closest point
+            classCnts[mDistIdx] += 1                            # increase counts
 
-    sumP0 = [0,0,0]
-    sumP1 = [0,0,0]
+        classArr.append(classRow)
+    print("CLASS COUNTS: ",end = "")
+    print(classCnts)
+    # pprint(classArr)
+    
     for i in range(yPix):
 
         for j in range(xPix):
         
-            if classArr[i][j][0] == 0:
-                sumP0[0] += int(imgArr[i][j][0])
-                sumP0[1] += int(imgArr[i][j][1])
-                sumP0[2] += int(imgArr[i][j][2])
-                
-            else:
-                sumP1[0] += int(imgArr[i][j][0])
-                sumP1[1] += int(imgArr[i][j][1])
-                sumP1[2] += int(imgArr[i][j][2])
-                
-    avgP0 = [0,0,0]
-    avgP1 = [0,0,0]
+            val = classArr[i][j]
+            sums[val][0] += int(imgArr[i][j][0])
+            sums[val][1] += int(imgArr[i][j][1])
+            sums[val][2] += int(imgArr[i][j][2])
+    
+    print("SUMS: ",end="")
+    print(sums)
 
-    avgP0[0] = sumP0[0]/numP0
-    avgP0[1] = sumP0[1]/numP0
-    avgP0[2] = sumP0[2]/numP0
+    for i in range(K):
+        try:
+            avgs[i][0] = int(sums[i][0]/classCnts[i])
+            avgs[i][1] = int(sums[i][1]/classCnts[i])
+            avgs[i][2] = int(sums[i][2]/classCnts[i])
+        except:
+            avgs[i] = [0,0,0]
 
-    avgP1[0] = sumP1[0]/numP1
-    avgP1[1] = sumP1[1]/numP1
-    avgP1[2] = sumP1[2]/numP1
-
-    print(avgP0,avgP1)
-
+    print("AVERAGES: ",end="")
+    print(avgs)
 
 
 ##########################################################################3
 # saving to file
 ##########################################################################3
 
-avgP0int = [0,0,0]
-avgP1int = [0,0,0]
-
-for i in range(3):
-    avgP0int[i] = int(avgP0[i])
-    avgP1int[i] = int(avgP1[i])
-
 newImg = []
 for i in range(yPix):
     tmpRow = []
     for j in range(xPix):
-        
-        if classArr[i][j][0] == 0:
-            tmpRow.append(avgP0int)
-        else:
-            tmpRow.append(avgP1int)
+        tmpRow.append(avgs[classArr[i][j]])
+      
     newImg.append(tmpRow)
 
 plt.figure()
