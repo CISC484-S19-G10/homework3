@@ -3,6 +3,8 @@ import os
 import numpy as np
 import random as rnd
 from matplotlib import cm
+from matplotlib import pyplot as plt
+
 
 
 def pprint(arr):
@@ -42,11 +44,9 @@ totalPix = xPix*yPix
 
 imgArr = np.asarray(img)    #convert to 3d array, x,y,RGB
 
-# pprint(imgArr)    #print array
 p0 = []
 p1 = []
 avgP0,avgP1 = initialPoints()
-# print(p0,p1,pntDistance(p0,p1))
 
 while((p0 != avgP0) and (p1 != avgP1)):
     
@@ -121,6 +121,8 @@ for i in range(yPix):
         else:
             tmpRow.append(avgP1int)
     newImg.append(tmpRow)
+# print(np.asarray(newImg))
 
-im = Image.fromarray(np.asarray(newImg),"RGB")
-im.show()
+plt.figure()
+plt.imshow(newImg,cmap="gist_earth",interpolation='nearest')
+plt.savefig('test.png')
