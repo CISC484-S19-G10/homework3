@@ -50,7 +50,7 @@ def getImage(imName):
 img,imgArr,xPix,yPix,totalPix = getImage('sunFlower.jpg')
 
 # img.show()    #display image
-K = 20
+K = 2
 kArr = {1,2,5,10,20}
 points = []
 
